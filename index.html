@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Chat</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            $(function() {
+                var iosocket = io.connect();
+                iosocket.on('connect', function() {
+                    $('#incomingChatMessages').append('<li>Connected</li>');
+
+                    iosocket.on('message', function(message) {
+                        $('#incomingChatMessages').append('<li>' + message + '</li>');
+                    });
+
+                    iosocket.on('disconnect', function() {
+                        $('#incomingChatMessages').append('<li>Disconnected</li>');
+                    });
+                });
+
+                $('#outgoingChatMessage').keypress(function (event) {
+                    if (event.which == 13) {
+                        event.preventDefault();
+                        iosocket.send($(this).val());
+                        $('#incomingChatMessages').append('<li>' + $(this).val() + '</li>');
+                        $(this).val('');
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <p>Incoming chat:</p>
+        <ul id="incomingChatMessages"></ul>
+
+        <input type="text" id="outgoingChatMessage" required="required" />
+    </body>
+</html>
